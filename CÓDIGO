@@ -1,4 +1,13 @@
 # include <Servo.h> //se carga la librería
+
+//Prototipo funciones de posición de los servos
+void posicion0();
+void posicion1();
+void posicion2();
+void posicion3();
+void posicion4();
+void posicion5();
+
 Servo servo1; // se pone el servo que se va a controlar
 Servo servo2;
 Servo servo3; 
@@ -17,6 +26,15 @@ int botb=12;
 int switchestado=0; //leer switch 
 
 
+//antirebote
+bool estadoAnta=false;
+bool estadoAntb=false;
+
+//estados modo automático
+typedef enum estados {s0, s1, s2, s3, s4, s5} estados;
+estados estadoactual = s0;
+estados estadofuturo = s0;
+
 void setup() {
 Serial.begin(9600); // se inicia la comunicación serial 
 servo1.attach(5); // se conecta el servo al pin 5
@@ -26,11 +44,16 @@ servo4.attach(10);
 pinMode(switch1, INPUT);
 pinMode(ledfa, OUTPUT);
 pinMode(ledpau, OUTPUT);
-
+pinMode(bota, INPUT);
+pinMode(botb, INPUT);
 }
 
 void loop() {
+bool after = digitalRead(bota);
+bool before = digitalRead(botb);
+
 switchestado = digitalRead(switch1);
+
 //Configuracion del modo manual
 if (switchestado==HIGH){
   digitalWrite(ledfa,HIGH);
@@ -62,6 +85,125 @@ if (switchestado==HIGH){
 else {
   digitalWrite(ledfa, LOW);
   digitalWrite(ledpau, HIGH);
+
+if (bota==HIGH && botb==HIGH){
+    estadoactual=estadofuturo;
+  }
+  estadoAnta=after
+  estadoAntb=before
+
+  if (bota==LOW && botb==LOW){
+    estadoactual=estadofuturo;
+  }
+  estadoAnta=after
+  estadoAntb=before
+
+  switch(estadoactual){
+    case s0:
+      if (bota==HIGH && botb==LOW){
+        estadofuturo=s1;
+      }
+      if (bota==LOW && botb==HIGH){
+        estadofuturo==s2
+      }
+      break;
+    
+    case s1:
+      if (bota==HIGH && botb==LOW){
+        estadofuturo=s2;
+      }
+      break;
+
+    case s2:
+      if (bota==HIGH && botb==LOW){
+        estadofuturo=s3;
+      }
+      break;
+
+    case s3:
+      if (bota==HIGH && botb==LOW){
+        estadofuturo=s4;
+      }
+      break;
+
+    case s4:
+      if (bota==HIGH && botb==LOW){
+        estadofuturo=s5;
+      }
+      break;
+
+    case s5:
+      if (bota==HIGH && botb==LOW){
+        estadofuturo=s0;
+      }
+      break;
+
+  estadoAnta=after
+  estadoAntb=before
+
+  switch(estadoactual){
+    case s0:
+      posicion0();
+      break;
+    case s1:
+      posicion1();
+      break;
+    case s2:
+      posicion2();
+      break;
+    case s3:
+      posicion3();
+      break();
+    case s4:
+      posicion4();
+      break;
+    case s5:
+      posicion5();
+      break;
+  }
+
 }
 
+}
+
+void posicion0(){
+  servo1.write(0);
+  servo2.write(0);
+  servo3.write(0);
+  servo4.write(0);
+}
+
+void posicion1(){
+  servo1.write(5);
+  servo2.write(45);
+  servo3.write(90);
+  servo4.write(135);
+}
+
+void posicion2(){
+  servo1.write(30);
+  servo2.write(60);
+  servo3.write(90);
+  servo4.write(120);
+}
+
+void posicion3(){
+  servo1.write(60);
+  servo2.write(90);
+  servo3.write(120);
+  servo4.write(60);
+}
+
+void posicion4(){
+  servo1.write(90);
+  servo2.write(120);
+  servo3.write(60);
+  servo4.write(30);
+}
+
+void posicion5(){
+  servo1.write(120);
+  servo2.write(150);
+  servo3.write(30);
+  servo4.write(0);
 }
