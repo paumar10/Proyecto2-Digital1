@@ -104,7 +104,7 @@ if (bota==HIGH && botb==HIGH){
         estadofuturo=s1;
       }
       if (bota==LOW && botb==HIGH){
-        estadofuturo==s2
+        estadofuturo==s5;
       }
       break;
     
@@ -112,30 +112,40 @@ if (bota==HIGH && botb==HIGH){
       if (bota==HIGH && botb==LOW){
         estadofuturo=s2;
       }
+      if (bota==LOW && botb==HIGH){
+        estadofuturo==s0;
       break;
 
     case s2:
       if (bota==HIGH && botb==LOW){
         estadofuturo=s3;
       }
+      if (bota==LOW && botb==HIGH){
+        estadofuturo==s1;
       break;
 
     case s3:
       if (bota==HIGH && botb==LOW){
         estadofuturo=s4;
       }
+      if (bota==LOW && botb==HIGH){
+        estadofuturo==s2;
       break;
 
     case s4:
       if (bota==HIGH && botb==LOW){
         estadofuturo=s5;
       }
+      if (bota==LOW && botb==HIGH){
+        estadofuturo==s3;
       break;
 
     case s5:
       if (bota==HIGH && botb==LOW){
         estadofuturo=s0;
       }
+      if (bota==LOW && botb==HIGH){
+        estadofuturo==s4;
       break;
 
   estadoAnta=after
