@@ -1,0 +1,66 @@
+# include <Servo.h> //se carga la librería
+Servo servo1; // se pone el servo que se va a controlar
+Servo servo2;
+Servo servo3; 
+Servo servo4;
+int pos=0; // se define la variable para guardar la posición del servo
+int pot1=A0; // se conecta el potencionmetro
+int pot2=A1;
+int pot3=A2;
+int pot4=A3;
+int switch1=4;
+int ledfa=3;
+int ledpau=2;
+
+
+int switchestado=0; //leer switch 
+
+
+void setup() {
+Serial.begin(9600); // se inicia la comunicación serial 
+servo1.attach(5); // se conecta el servo al pin 5
+servo2.attach(6); 
+servo3.attach(9); 
+servo4.attach(10); 
+pinMode(switch1, INPUT);
+pinMode(ledfa, OUTPUT);
+pinMode(ledpau, OUTPUT);
+
+}
+
+void loop() {
+switchestado = digitalRead(switch1);
+//Configuracion del modo manual
+if (switchestado==HIGH){
+  digitalWrite(ledfa,HIGH);
+  digitalWrite(ledpau,LOW);
+  int valor1 = analogRead(pot1); //se lee el valor dado por el potenciometro 
+  int valor2 = analogRead(pot2);
+  int valor3 = analogRead(pot3);
+  int valor4 = analogRead(pot4);
+  valor1= map(valor1, 0, 1023, 0, 180); // se mapea el valor del servo, 180 es el máximo
+  valor2= map(valor2, 0, 1023, 0, 180);
+  valor3= map(valor3, 0, 1023, 0, 180);
+  valor4= map(valor4, 0, 1023, 0, 180);
+  servo1.write(valor1); 
+  servo2.write(valor2); 
+  servo3.write(valor3); 
+  servo4.write(valor4); 
+  Serial.print("Valor 1:");
+  Serial.println(valor1);
+  Serial.print("Valor 2:");
+  Serial.println(valor2);
+  Serial.print("Valor 3:");
+  Serial.println(valor3);
+  Serial.print("Valor 4:");
+  Serial.println(valor4);
+  delay(200);
+}
+
+//Configuracion del modo automatico
+else {
+  digitalWrite(ledfa, LOW);
+  digitalWrite(ledpau, HIGH);
+}
+
+}
