@@ -11,7 +11,8 @@ int pot4=A3;
 int switch1=4;
 int ledfa=3;
 int ledpau=2;
-
+int bota=11; 
+int botb=12; 
 
 int switchestado=0; //leer switch 
 
