@@ -7,6 +7,7 @@ void posicion2();
 void posicion3();
 void posicion4();
 void posicion5();
+void imprimirposiciones();
 
 Servo servo1; // se pone el servo que se va a controlar
 Servo servo2;
@@ -154,25 +155,33 @@ if (after==HIGH && before==HIGH){
   switch(estadoactual){
     case s0:
       posicion0();
+      imprimirposiciones();
       break;
     case s1:
       posicion1();
+      imprimirposiciones();
       break;
     case s2:
       posicion2();
+      imprimirposiciones();
       break;
     case s3:
       posicion3();
+      imprimirposiciones();
       break();
     case s4:
       posicion4();
+      imprimirposiciones();
       break;
     case s5:
       posicion5();
+      imprimirposiciones();
       break;
   }
+  delay(500);
 }
-
+  estadoAnta=after
+  estadoAntb=before
 }
 
 void posicion0(){
@@ -217,5 +226,14 @@ void posicion5(){
   servo4.write(0);
 }
 
-delay(200);
+void imprimirposiciones(){
+  Serial.print("Posición del servo 1: ");
+  Serial.println(servo1.read());
+  Serial.print("Posición del servo 2: ");
+  Serial.println(servo2.read());
+  Serial.print("Posición del servo 3: ");
+  Serial.println(servo3.read());
+  Serial.print("Posición del servo 4: ");
+  Serial.println(servo4.read());
+}
 }
