@@ -86,13 +86,13 @@ else {
   digitalWrite(ledfa, LOW);
   digitalWrite(ledpau, HIGH);
 
-if (bota==HIGH && botb==HIGH){
+if (after==HIGH && before==HIGH){
     estadoactual=estadofuturo;
   }
   estadoAnta=after
   estadoAntb=before
 
-  if (bota==LOW && botb==LOW){
+  if (after==LOW && before==LOW){
     estadoactual=estadofuturo;
   }
   estadoAnta=after
@@ -100,51 +100,51 @@ if (bota==HIGH && botb==HIGH){
 
   switch(estadoactual){
     case s0:
-      if (bota==HIGH && botb==LOW){
+      if (after==HIGH && before==LOW){
         estadofuturo=s1;
       }
-      if (bota==LOW && botb==HIGH){
+      if (after==LOW && before==HIGH){
         estadofuturo==s5;
       }
       break;
     
     case s1:
-      if (bota==HIGH && botb==LOW){
+      if (after==HIGH && before==LOW){
         estadofuturo=s2;
       }
-      if (bota==LOW && botb==HIGH){
+      if (after==LOW && before==HIGH){
         estadofuturo==s0;
       break;
 
     case s2:
-      if (bota==HIGH && botb==LOW){
+      if (after==HIGH && before==LOW){
         estadofuturo=s3;
       }
-      if (bota==LOW && botb==HIGH){
+      if (after==LOW && before==HIGH){
         estadofuturo==s1;
       break;
 
     case s3:
-      if (bota==HIGH && botb==LOW){
+      if (after==HIGH && before==LOW){
         estadofuturo=s4;
       }
-      if (bota==LOW && botb==HIGH){
+      if (after==LOW && before==HIGH){
         estadofuturo==s2;
       break;
 
     case s4:
-      if (bota==HIGH && botb==LOW){
+      if (after==HIGH && before==LOW){
         estadofuturo=s5;
       }
-      if (bota==LOW && botb==HIGH){
+      if (after==LOW && before==HIGH){
         estadofuturo==s3;
       break;
 
     case s5:
-      if (bota==HIGH && botb==LOW){
+      if (after==HIGH && before==LOW){
         estadofuturo=s0;
       }
-      if (bota==LOW && botb==HIGH){
+      if (after==LOW && before==HIGH){
         estadofuturo==s4;
       break;
 
@@ -171,7 +171,6 @@ if (bota==HIGH && botb==HIGH){
       posicion5();
       break;
   }
-
 }
 
 }
@@ -216,4 +215,7 @@ void posicion5(){
   servo2.write(150);
   servo3.write(30);
   servo4.write(0);
+}
+
+delay(200);
 }
