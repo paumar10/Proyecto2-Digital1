@@ -90,11 +90,14 @@ else {
 if (after==HIGH && before==HIGH){
     estadoactual=estadofuturo;
   }
-  estadoAnta=after
-  estadoAntb=before
 
   if (after==LOW && before==LOW){
     estadoactual=estadofuturo;
+  }
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= tiempo) {
+    imprimirposiciones();
+    previousMillis = currentMillis;
   }
   estadoAnta=after
   estadoAntb=before
@@ -149,36 +152,27 @@ if (after==HIGH && before==HIGH){
         estadofuturo==s4;
       break;
 
-  estadoAnta=after
-  estadoAntb=before
 
   switch(estadoactual){
     case s0:
       posicion0();
-      imprimirposiciones();
       break;
     case s1:
       posicion1();
-      imprimirposiciones();
       break;
     case s2:
       posicion2();
-      imprimirposiciones();
       break;
     case s3:
       posicion3();
-      imprimirposiciones();
       break();
     case s4:
       posicion4();
-      imprimirposiciones();
       break;
     case s5:
       posicion5();
-      imprimirposiciones();
       break;
   }
-  delay(500);
 }
   estadoAnta=after
   estadoAntb=before
