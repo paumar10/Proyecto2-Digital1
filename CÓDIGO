@@ -1,240 +1,100 @@
-# include <Servo.h> //se carga la librería
+//Se carga la librería del servo
+# include <Servo.h> 
 
-//Prototipo funciones de posición de los servos
-void posicion0();
-void posicion1();
-void posicion2();
-void posicion3();
-void posicion4();
-void posicion5();
-void imprimirposiciones();
+//Estos son los prototipos de funciones, que en wokwi no funcionan, porque no se trabaja así
 
-Servo servo1; // se pone el servo que se va a controlar
+//Las primeras 4 funciones tienen dentro la posición de cada servo en el modo autómatico, dependiendo del caso
+//Esta es para el caso 0
+//void posicion0();
+//Esta es para el caso 1
+//void posicion1();
+//Esta es para el caso 2
+//void posicion2();
+//Esta es para el caso 3
+//void posicion3();
+//Esta es para el caso 4
+//void posicion4(); 
+//Esta es para el caso 5
+//void posicion5(); 
+
+//Esta función es para imprimir las posiciones de los servos en el modo automático
+//void imprimirposiciones();
+
+//Se llama la librería y se identifican los servos a controlar
+Servo servo1; 
 Servo servo2;
 Servo servo3; 
 Servo servo4;
-int pos=0; // se define la variable para guardar la posición del servo
-int pot1=A0; // se conecta el potencionmetro
+
+//Se define la variable para guardar las posiciones de los servos
+int pos=0;
+
+//Se definen variables para los potenciómetros, el switch, las leds y los botones
+int pot1=A0;
 int pot2=A1;
 int pot3=A2;
 int pot4=A3;
 int switch1=4;
 int ledfa=3;
 int ledpau=2;
-int bota=11; 
-int botb=12; 
+int bota= 11;
+int botb= 12;
 
-int switchestado=0; //leer switch 
+//Se define la lectura inicial del switch
+int switchestado=0; 
 
-
-//Antirebote
-bool estadoAnta=LOW;
-bool estadoAntb=LOW;
+//Se establecen las variables del antirrebote, que funciona al guardar los estados anteriores en variables booleanas e igualarlos a los estados actuales
+bool estadoAnta = LOW; 
+bool estadoAntb = LOW;
 bool after;
 bool before;
 
-//estados modo automático
-typedef enum estados {s0, s1, s2, s3, s4, s5} estados;
-estados estadoactual = s0;
-estados estadofuturo = s0;
+//Se establecen los estados para usar en el modo automático del programa
+typedef enum estados {s0, s1, s2, s3,s4, s5} estados; 
+estados estadoactual= s0; 
+estados estadofuturo= s0; 
 
-//Definimos variables de tiempo para la impresión de posición de los servos en el modo automático
+//Se definen variables de tiempo para la impresión de posición de los servos en el modo automático
 const long tiempo = 1000;
 unsigned long previousMillis = 0;
 
-//Definimos variables de tiempo para la impresión de posición de los servos en el modo automático
+//Se definen variables de tiempo para la lectura de los cambios y flancos del botón, para el antirrebote
 const long tiempoboton = 10;
 unsigned long previousMillisboton = 0;
 
-void setup() {
-Serial.begin(9600); // se inicia la comunicación serial 
-servo1.attach(5); // se conecta el servo al pin 5
-servo2.attach(6); 
-servo3.attach(9); 
-servo4.attach(10); 
-pinMode(switch1, INPUT);
-pinMode(ledfa, OUTPUT);
-pinMode(ledpau, OUTPUT);
-pinMode(bota, INPUT);
-pinMode(botb, INPUT);
-}
+//Se definen las funciones previamente mencionadas, en el área de prototipo
 
-void loop() {
-switchestado = digitalRead(switch1);
-
-bool after = digitalRead(bota);
-bool before = digitalRead(botb);
-
-bool flancoA = (after == LOW && estadoAnta==HIGH); //NUEVO
-bool flancoB = (before == LOW && estadoAntb == HIGH); //NUEVO
-
-unsigned long currentMillisboton = millis();
-  if (currentMillisboton - previousMillisboton >= tiempoboton) {
-    estadoAnta = after;
-    estadoAntb = before;
-    previousMillisboton = currentMillisboton;
-  }
-
-//Configuracion del modo manual
-if (switchestado==HIGH){
-  digitalWrite(ledfa,HIGH);
-  digitalWrite(ledpau,LOW);
-  int valor1 = analogRead(pot1); //se lee el valor dado por el potenciometro 
-  int valor2 = analogRead(pot2);
-  int valor3 = analogRead(pot3);
-  int valor4 = analogRead(pot4);
-  valor1= map(valor1, 0, 1023, 0, 180); // se mapea el valor del servo, 180 es el máximo
-  valor2= map(valor2, 0, 1023, 0, 180);
-  valor3= map(valor3, 0, 1023, 0, 180);
-  valor4= map(valor4, 0, 1023, 0, 180);
-  servo1.write(valor1); 
-  servo2.write(valor2); 
-  servo3.write(valor3); 
-  servo4.write(valor4); 
-  Serial.print("Valor 1:");
-  Serial.println(valor1);
-  Serial.print("Valor 2:");
-  Serial.println(valor2);
-  Serial.print("Valor 3:");
-  Serial.println(valor3);
-  Serial.print("Valor 4:");
-  Serial.println(valor4);
-  delay(200);
-}
-
-//Configuracion del modo automatico
-else {
-  digitalWrite(ledfa, LOW);
-  digitalWrite(ledpau, HIGH);
-
-if (after==HIGH && before==HIGH){
-    estadoactual=estadofuturo;
-  }
-
-  if (after==LOW && before==LOW){
-    estadoactual=estadofuturo;
-  }
-unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= tiempo) {
-    imprimirposiciones();
-    previousMillis = currentMillis;
-  }
-
-  switch(estadoactual) {
-    case s0: 
-      if(flancoA == true) {
-        estadofuturo= s1;
-      }
-      if(flancoB == true) {
-        estadofuturo= s5;
-      }
-      break; 
-
-    case s1: 
-      if(flancoA == true) {
-        estadofuturo= s2;
-      }
-      if (flancoB == true){
-        estadofuturo= s0;
-      }
-      break;
-
-    case s2: 
-      if(flancoA == true) {
-        estadofuturo= s3;
-      }
-      if(flancoB == true) {
-        estadofuturo= s1;
-      } 
-      break;
-
-    case s3: 
-      if(flancoA == true) {
-        estadofuturo= s4;
-      }
-      if (flancoB == true) {
-        estadofuturo= s2;
-      } 
-      break;
-
-    case s4: 
-      if(flancoA == true) {
-        estadofuturo= s5;
-      }
-      if(flancoB == true) {
-        estadofuturo= s3;
-      }  
-      break;
-
-    case s5: 
-      if(flancoA == true) {
-        estadofuturo= s0;
-      }
-      if(flancoB == true){
-        estadofuturo= s4;
-      }  
-      break;
-  }
-
-
-  switch(estadoactual){
-    case s0:
-      posicion0();
-      break;
-    case s1:
-      posicion1();
-      break;
-    case s2:
-      posicion2();
-      break;
-    case s3:
-      posicion3();
-      break();
-    case s4:
-      posicion4();
-      break;
-    case s5:
-      posicion5();
-      break;
-  }
-}
-}
-
+//En cada una de estas se encuentran los servos en diferentes posiciones
 void posicion0(){
   servo1.write(0);
   servo2.write(0);
   servo3.write(0);
   servo4.write(0);
 }
-
 void posicion1(){
   servo1.write(5);
   servo2.write(45);
   servo3.write(90);
   servo4.write(135);
 }
-
 void posicion2(){
   servo1.write(30);
   servo2.write(60);
   servo3.write(90);
   servo4.write(120);
 }
-
 void posicion3(){
   servo1.write(60);
   servo2.write(90);
   servo3.write(120);
   servo4.write(60);
 }
-
 void posicion4(){
   servo1.write(90);
   servo2.write(120);
   servo3.write(60);
   servo4.write(30);
 }
-
 void posicion5(){
   servo1.write(120);
   servo2.write(150);
@@ -242,6 +102,7 @@ void posicion5(){
   servo4.write(0);
 }
 
+//Se define la función para la impresión de posiciones del servo 
 void imprimirposiciones(){
   Serial.print("Posición del servo 1: ");
   Serial.println(servo1.read());
@@ -252,4 +113,242 @@ void imprimirposiciones(){
   Serial.print("Posición del servo 4: ");
   Serial.println(servo4.read());
 }
+
+void setup() {
+//Se inicia la comunicación serial
+Serial.begin(9600); 
+
+//Se llama a los servos, indicando a los pines que se conectó cada uno
+servo1.attach(5);
+servo2.attach(6); 
+servo3.attach(9); 
+servo4.attach(10); 
+
+//Se definen inputs y outputs, siendo los inputs el switch y los botones y los outputs las leds
+pinMode(switch1, INPUT);
+pinMode(ledfa, OUTPUT);
+pinMode(ledpau, OUTPUT);
+pinMode(bota, INPUT);
+pinMode(botb, INPUT);
+
 }
+
+void loop() {
+//Se determina la dependencia del estado a la posición del switch
+switchestado = digitalRead(switch1);
+
+//Se coloca el antirrebote y sus comparaciones con las lecturas de los botones
+after = digitalRead(bota); 
+before = digitalRead(botb);
+
+bool flancoA = (after == LOW && estadoAnta==HIGH);
+bool flancoB = (before == LOW && estadoAntb == HIGH);
+
+//Se colocan los tiempos para que se lea correctamente el antirrebote
+unsigned long currentMillisboton = millis();
+  if (currentMillisboton - previousMillisboton >= tiempoboton) {
+    estadoAnta = after;
+    estadoAntb = before;
+    previousMillisboton = currentMillisboton;
+  }
+
+
+//Esta es la configuración del modo manual, donde las posiciones de los servos dependen de potenciómetros
+if (switchestado==HIGH){
+  digitalWrite(ledfa,HIGH);
+  digitalWrite(ledpau,LOW);
+
+ //Se leen los valores de cada potenciómetro
+  int valor1 = analogRead(pot1); 
+  int valor1 = analogRead(pot1); 
+  int valor2 = analogRead(pot2);
+  int valor3 = analogRead(pot3);
+  int valor4 = analogRead(pot4);
+
+  //Se mapean los valores de los servos, relacionando cada uno a un potenciómetro
+  valor1= map(valor1, 0, 1023, 0, 180);
+  valor2= map(valor2, 0, 1023, 0, 180);
+  valor3= map(valor3, 0, 1023, 0, 180);
+  valor4= map(valor4, 0, 1023, 0, 180);
+
+  //Se le indica al servo el valor del que depende su posición, acorde al valor del potenciómetro
+  servo1.write(valor1); 
+  servo2.write(valor2); 
+  servo3.write(valor3); 
+  servo4.write(valor4);
+
+  //Se imprimen los valores de las posiciones de cada servo 
+  Serial.print("Posición del servo 1:");
+  Serial.println(valor1);
+  Serial.print("Posición del servo 2:");
+  Serial.println(valor2);
+  Serial.print("Posición del servo 3:");
+  Serial.println(valor3);
+  Serial.print("Posición del servo 4:");
+  Serial.println(valor4);
+  delay(200);
+}
+
+//Esta es la configuración del modo automático
+else {
+  digitalWrite(ledfa, LOW);
+  digitalWrite(ledpau, HIGH);
+  if (after==HIGH && before==HIGH){
+    estadoactual=estadofuturo;
+  }
+
+  if (after==LOW && before==LOW){
+    estadoactual=estadofuturo;
+  }
+
+//Se coloca la impresión de posiciones dentro de un millis, para que se impriman a una velocidad controlada
+unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= tiempo) {
+    imprimirposiciones();
+    previousMillis = currentMillis;
+  }
+
+//Colocamos el primer switch, que indica cómo se pasa a cada caso, dependiendo del botón que se presione
+//Se colocan breaks en todo para evitar que se estanque en un caso
+  switch(estadoactual) {
+    case s0: 
+      if(flancoA == true) {
+        estadofuturo= s1;
+      }
+
+      if(flancoB == true) {
+        estadofuturo= s5;
+      }
+
+      break; 
+
+    case s1: 
+      if(flancoA == true) {
+        estadofuturo= s2;
+      }
+
+      if (flancoB == true){
+        estadofuturo= s0;
+      }
+
+      break;
+
+    case s2: 
+      if(flancoA == true) {
+        estadofuturo= s3;
+      }
+
+      if(flancoB == true) {
+        estadofuturo= s1;
+      } 
+
+      break;
+
+    case s3: 
+      if(flancoA == true) {
+        estadofuturo= s4;
+      }
+
+      if (flancoB == true) {
+        estadofuturo= s2;
+      } 
+
+      break;
+
+    case s4: 
+      if(flancoA == true) {
+        estadofuturo= s5;
+      }
+
+      if(flancoB == true) {
+        estadofuturo= s3;
+      }  
+
+      break;
+
+    case s5: 
+      if(flancoA == true) {
+        estadofuturo= s0;
+      }
+
+      if(flancoB == true){
+        estadofuturo= s4;
+      }  
+
+      break;
+  }
+
+//Este segundo switch determina qué pasa en cada caso, es decir la posición que toma cada servo
+  switch(estadoactual){
+    case s0: 
+      posicion0();
+      break; 
+    case s1:
+      posicion1();
+      break; 
+    case s2: 
+      posicion2();
+      break; 
+    case s3: 
+      posicion3();
+      break; 
+    case s4: 
+      posicion4();
+      break; 
+    case s5: 
+      posicion5();
+      break; 
+
+
+}
+
+}
+}
+
+/*void posicion0(){
+  servo1.write(0);
+  servo2.write(0);
+  servo3.write(0);
+  servo4.write(0);
+}
+void posicion1(){
+  servo1.write(5);
+  servo2.write(45);
+  servo3.write(90);
+  servo4.write(135);
+}
+void posicion2(){
+  servo1.write(30);
+  servo2.write(60);
+  servo3.write(90);
+  servo4.write(120);
+}
+void posicion3(){
+  servo1.write(60);
+  servo2.write(90);
+  servo3.write(120);
+  servo4.write(60);
+}
+void posicion4(){
+  servo1.write(90);
+  servo2.write(120);
+  servo3.write(60);
+  servo4.write(30);
+}
+void posicion5(){
+  servo1.write(120);
+  servo2.write(150);
+  servo3.write(30);
+  servo4.write(0);
+}
+void imprimirposiciones(){
+  Serial.print("Posición del servo 1: ");
+  Serial.println(servo1.read());
+  Serial.print("Posición del servo 2: ");
+  Serial.println(servo2.read());
+  Serial.print("Posición del servo 3: ");
+  Serial.println(servo3.read());
+  Serial.print("Posición del servo 4: ");
+  Serial.println(servo4.read());
+}
+*/
