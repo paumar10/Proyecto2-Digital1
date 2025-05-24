@@ -160,7 +160,6 @@ if (switchestado==HIGH){
 
  //Se leen los valores de cada potenciómetro
   int valor1 = analogRead(pot1); 
-  int valor1 = analogRead(pot1); 
   int valor2 = analogRead(pot2);
   int valor3 = analogRead(pot3);
   int valor4 = analogRead(pot4);
