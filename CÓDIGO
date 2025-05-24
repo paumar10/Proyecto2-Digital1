@@ -27,14 +27,24 @@ int botb=12;
 int switchestado=0; //leer switch 
 
 
-//antirebote
-bool estadoAnta=false;
-bool estadoAntb=false;
+//Antirebote
+bool estadoAnta=LOW;
+bool estadoAntb=LOW;
+bool after;
+bool before;
 
 //estados modo automático
 typedef enum estados {s0, s1, s2, s3, s4, s5} estados;
 estados estadoactual = s0;
 estados estadofuturo = s0;
+
+//Definimos variables de tiempo para la impresión de posición de los servos en el modo automático
+const long tiempo = 1000;
+unsigned long previousMillis = 0;
+
+//Definimos variables de tiempo para la impresión de posición de los servos en el modo automático
+const long tiempoboton = 10;
+unsigned long previousMillisboton = 0;
 
 void setup() {
 Serial.begin(9600); // se inicia la comunicación serial 
@@ -50,10 +60,20 @@ pinMode(botb, INPUT);
 }
 
 void loop() {
+switchestado = digitalRead(switch1);
+
 bool after = digitalRead(bota);
 bool before = digitalRead(botb);
 
-switchestado = digitalRead(switch1);
+bool flancoA = (after == LOW && estadoAnta==HIGH); //NUEVO
+bool flancoB = (before == LOW && estadoAntb == HIGH); //NUEVO
+
+unsigned long currentMillisboton = millis();
+  if (currentMillisboton - previousMillisboton >= tiempoboton) {
+    estadoAnta = after;
+    estadoAntb = before;
+    previousMillisboton = currentMillisboton;
+  }
 
 //Configuracion del modo manual
 if (switchestado==HIGH){
@@ -94,63 +114,67 @@ if (after==HIGH && before==HIGH){
   if (after==LOW && before==LOW){
     estadoactual=estadofuturo;
   }
-  unsigned long currentMillis = millis();
+unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= tiempo) {
     imprimirposiciones();
     previousMillis = currentMillis;
   }
-  estadoAnta=after
-  estadoAntb=before
 
-  switch(estadoactual){
-    case s0:
-      if (after==HIGH && before==LOW){
-        estadofuturo=s1;
+  switch(estadoactual) {
+    case s0: 
+      if(flancoA == true) {
+        estadofuturo= s1;
       }
-      if (after==LOW && before==HIGH){
-        estadofuturo==s5;
+      if(flancoB == true) {
+        estadofuturo= s5;
       }
-      break;
-    
-    case s1:
-      if (after==HIGH && before==LOW){
-        estadofuturo=s2;
-      }
-      if (after==LOW && before==HIGH){
-        estadofuturo==s0;
-      break;
+      break; 
 
-    case s2:
-      if (after==HIGH && before==LOW){
-        estadofuturo=s3;
+    case s1: 
+      if(flancoA == true) {
+        estadofuturo= s2;
       }
-      if (after==LOW && before==HIGH){
-        estadofuturo==s1;
+      if (flancoB == true){
+        estadofuturo= s0;
+      }
       break;
 
-    case s3:
-      if (after==HIGH && before==LOW){
-        estadofuturo=s4;
+    case s2: 
+      if(flancoA == true) {
+        estadofuturo= s3;
       }
-      if (after==LOW && before==HIGH){
-        estadofuturo==s2;
+      if(flancoB == true) {
+        estadofuturo= s1;
+      } 
       break;
 
-    case s4:
-      if (after==HIGH && before==LOW){
-        estadofuturo=s5;
+    case s3: 
+      if(flancoA == true) {
+        estadofuturo= s4;
       }
-      if (after==LOW && before==HIGH){
-        estadofuturo==s3;
+      if (flancoB == true) {
+        estadofuturo= s2;
+      } 
       break;
 
-    case s5:
-      if (after==HIGH && before==LOW){
-        estadofuturo=s0;
+    case s4: 
+      if(flancoA == true) {
+        estadofuturo= s5;
       }
-      if (after==LOW && before==HIGH){
-        estadofuturo==s4;
+      if(flancoB == true) {
+        estadofuturo= s3;
+      }  
       break;
+
+    case s5: 
+      if(flancoA == true) {
+        estadofuturo= s0;
+      }
+      if(flancoB == true){
+        estadofuturo= s4;
+      }  
+      break;
+  }
 
 
   switch(estadoactual){
@@ -174,8 +198,6 @@ if (after==HIGH && before==HIGH){
       break;
   }
 }
-  estadoAnta=after
-  estadoAntb=before
 }
 
 void posicion0(){
